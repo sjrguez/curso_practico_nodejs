@@ -1,5 +1,7 @@
 const bscrypt = require('bcrypt');
 const auth = require('../../../auth')
+const error = require('../../../utils/error')
+
 
 const TABLA = 'auth';
 
@@ -20,7 +22,7 @@ module.exports = function(injectedStore) {
                     return token
 
                 } else {
-                    throw new Error("Informacion invalida")
+                    throw error("Informacion invalida", 400)
                 }
             }).catch(error => {
                 throw error
