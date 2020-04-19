@@ -1,6 +1,6 @@
 const express = require('express');
 
-const secure = require('./secure')
+const secure = require('../auth/secure')
 const response = require('../../../network/responde');
 const Controller = require('./index');
 
@@ -11,10 +11,12 @@ ROUTER.get('/', getAll)
 
 ROUTER.get('/:id', getOne)
 
-ROUTER.post('/', upsert)
+ROUTER.post('/', add)
+ROUTER.put('/', secure('update'), update)
 
+ROUTER.post('/follow/:id', secure('logged'), follow)
+ROUTER.get('/following/:id', following)
 
-ROUTER.put('/', secure('update'), upsert)
 
 
 
@@ -32,7 +34,7 @@ function getOne(req, res, next) {
 }
 
 
-function upsert(req, res, next) {
+function add(req, res, next) {
     const body = req.body;
     Controller.upsert(body).then((user) => {
         response.success(req, res, user, 200)
@@ -40,12 +42,23 @@ function upsert(req, res, next) {
 
 }
 
-function remove(req, res, next) {
-    Controller.remove(req.params.id).then((user) => {
+function update(req, res, next) {
+    const body = req.body;
+    Controller.upsert(body, true).then((user) => {
         response.success(req, res, user, 200)
-    }).catch((error) => {
-        response.error(req, res, error.message, 500)
-    });
+    }).catch(next);
+
 }
 
+function follow(req, res, next) {
+    Controller.follow(req.user.id, req.params.id).then((data) => {
+        response.success(req, res, data, 200)
+    }).catch(next);
+}
+
+function following(req, res, next) {
+    Controller.following(req.params.id).then((data) => {
+        response.success(req, res, data, 200)
+    }).c
+}
 module.exports = ROUTER;

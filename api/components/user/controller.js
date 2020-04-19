@@ -18,7 +18,7 @@ module.exports = function(injectedStore) {
     }
 
 
-    async function upsert(data) {
+    async function upsert(data, isUpdate) {
 
         const user = {
             name: data.name,
@@ -33,23 +33,37 @@ module.exports = function(injectedStore) {
                 id: user.id,
                 username: user.username,
                 password: data.password
-            })
+            }, isUpdate)
 
         }
 
 
-        return store.upsert(TABLA, user);
+        return store.upsert(TABLA, user, isUpdate);
     }
 
 
-    function remove(id) {
-        return store.remove(TABLA, id);
+    async function follow(from, to) {
+        const data = {
+            user_from: from,
+            user_to: to
+        };
+
+        return store.upsert(`${TABLA}_follow`, data);
+    }
+
+    async function following(user) {
+        const join = {};
+        join[TABLA] = 'user_to';
+
+        const query = { user_from: user };
+        return await store.query(TABLA + '_follow', query, join)
     }
 
     return {
         list,
         get,
         upsert,
-        remove
+        follow,
+        following
     }
 }

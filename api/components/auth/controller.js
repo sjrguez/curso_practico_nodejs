@@ -12,12 +12,14 @@ module.exports = function(injectedStore) {
     }
     async function login(username, password) {
         const data = await store.query(TABLA, { username });
+        console.log(data, "dd");
 
         return bscrypt.compare(password, data.password)
             .then(async(valida) => {
                 console.log(valida, "valida");
 
                 if (valida) {
+
                     const token = await auth.sign(data);
                     return token
 
@@ -25,12 +27,14 @@ module.exports = function(injectedStore) {
                     throw error("Informacion invalida", 400)
                 }
             }).catch(error => {
+                console.log(error, "err");
+
                 throw error
             })
 
     }
 
-    async function upsert(data) {
+    async function upsert(data, isUpdate) {
         const authData = {
             id: data.id
         }
@@ -38,7 +42,7 @@ module.exports = function(injectedStore) {
         if (data.username) authData.username = data.username
         if (data.password) authData.password = bscrypt.hashSync(data.password, 11);
 
-        return store.upsert(TABLA, authData)
+        return store.upsert(TABLA, authData, isUpdate)
     }
 
 

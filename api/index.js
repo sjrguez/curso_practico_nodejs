@@ -7,6 +7,7 @@ const config = require('../config.js')
 const user = require('./components/user/network')
 const auth = require('./components/auth/network')
 
+
 const app = express();
 
 app.use(bodyParser.json());

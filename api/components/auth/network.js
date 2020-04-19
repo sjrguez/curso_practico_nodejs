@@ -13,7 +13,11 @@ function loguear(req, res) {
 
 
     Controller.login(body.username, body.password)
-        .then((token) => response.success(req, res, token, 200))
+        .then((token) => {
+            console.log(token, "token");
+            response.success(req, res, token, 200)
+
+        })
         .catch(error => response.error(req, res, error, 400))
 }
 
